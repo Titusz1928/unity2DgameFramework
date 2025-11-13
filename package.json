@@ -1,0 +1,14 @@
+{
+  "name": "com.titusgames.framework",
+  "displayName": "TitusGames Framework",
+  "version": "1.0.0",
+  "unity": "6000.0",
+  "description": "A reusable Unity framework for android games with scene, window, localization, and audio management.",
+  "author": {
+    "name": "Boros Titusz",
+    "email": "titusz.boros@student.upt.ro"
+  },
+  "dependencies": {
+    "com.unity.textmeshpro": "3.0.6"
+  }
+}

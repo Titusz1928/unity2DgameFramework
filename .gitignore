@@ -1,0 +1,23 @@
+# Unity package repository ignore rules
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+
+# OS / IDE files
+.DS_Store
+.vs/
+.idea/
+*.user
+*.suo
+*.tmp
+*.bak
+
+# Unity auto-generated
+*.pidb
+*.booproj
+*.userprefs
