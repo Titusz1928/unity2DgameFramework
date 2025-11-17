@@ -16,6 +16,7 @@ The framework is designed to help you rapidly build consistent projects without 
 - **WindowManager** – create UI windows and open them from buttons.  
 - **LocalizationManager** – localize any TextMeshPro UI element with JSON files.  
 - **AudioManager** – play SFX and music stored inside the framework’s audio folder.
+- **MessageManager** – make messages appear.
 
 ---
 
@@ -29,6 +30,7 @@ _Framework/<br>
 │ ├── WindowManager.cs<br>
 │ ├── LocalizationManager.cs<br>
 │ └── AudioManager.cs<br>
+│ └── MessageManager.cs<br>
 │<br>
 ├── UI/<br>
 │ └── Windows/<br>
@@ -52,7 +54,7 @@ _Framework/<br>
 
 # 🎮 SceneManager
 
-The `SceneManager` lets you load scenes by name and exit the game.
+The `SceneManager` lets you load scenes by name and exit the game. Every new scene that you create should have a canvas which needs a WindowRoot and a MessageContainer gameobject.
 
 ### ✔ Load a Scene
 ```csharp
