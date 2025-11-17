@@ -153,13 +153,38 @@ _Framework/Resources/Audio/
 
 Place .wav or .mp3 files into _Framework/Resources/Audio.
 
+You can assign the audio files to the script with the inspector:
+
+```csharp
+[SerializeField] private AudioClip placeSound;
+```
+
+or retrieve them:
+
+```csharp
+AudioClip placeSound = Resources.Load<AudioClip>("Audio/place");
+```
+
 Use the filename without extension when calling Play.
 
 ### ✔ Play a Sound
-AudioManager.Instance.Play("click");
+AudioManager.Instance.Play(click);
 
 ### ✔ Play Music
-AudioManager.Instance.PlayMusic("background");
+AudioManager.Instance.PlayMusic(background);
+
+# 💬 MessageManager
+
+The role of this manager is to visualize messages from the game/system to the user. For example: "Game saved", "... not available", etc.
+
+### Code example
+
+The first parameter is the key for a localized text, this key will be replaced by the corresponding value from the localization .json files. The second value is the sprite that the message box will use.
+
+```chsarp
+Sprite infoIcon = Resources.Load<Sprite>("UI/Icons/info2");
+MessageManager.Instance.ShowMessage("testmessage", infoIcon);
+```
 
 # 🧪 Example Workflow
 
