@@ -16,7 +16,7 @@ Open Unity and go to Window > Package Manager.
 
 Click the + button and select Add package from git URL...
 
-Paste your repository URL: https://github.com/your-username/your-repo.git
+Paste your repository URL: https://github.com/Titusz1928/unity2DgameFramework.git
 
 **2. Import the Framework**
 
