@@ -16,7 +16,7 @@ Open Unity and go to Window > Package Manager.
 
 Click the + button and select Add package from git URL...
 
-Paste your repository URL: https://github.com/Titusz1928/unity2DgameFramework.git
+Paste your repository URL: https://github.com/your-username/your-repo.git
 
 **2. Import the Framework**
 
@@ -176,8 +176,9 @@ _Framework/Resources/Audio/
 
 The AudioManager is generic. You don't need to modify the script to add new sounds; it automatically finds any audio file placed in the correct Resources folder using the filename as a key.
 
-[!WARNING]
-Manual File Placement Required: By default, the framework is empty. You must manually create the folders and add your audio files for the manager to work.
+> [!WARNING]
+> **Manual File Placement Required:** By default, the framework is empty. 
+> You must add your audio files for the manager to work.
 
 ### ✔ Folder Structure
 Place your files in these exact paths inside your Resources folder:
