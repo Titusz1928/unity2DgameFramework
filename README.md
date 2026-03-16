@@ -4,10 +4,35 @@
 
 # TitusGames Framework
 
-A reusable Unity framework for 2D Android games, providing ready-made systems for Scene Management, Windows/UI, Localization, and Audio.  
+A reusable Unity framework for 2D games, providing ready-made systems for Booting, Scene Management, Windows/UI, Localization, Audio and in-game messages/notifications.  
 The framework is designed to help you rapidly build consistent projects without rewriting core systems every time.
 
 ---
+
+## ⚙ Installation & Setup
+**1. Install via UPM**
+
+Open Unity and go to Window > Package Manager.
+
+Click the + button and select Add package from git URL...
+
+Paste your repository URL: https://github.com/your-username/your-repo.git
+
+**2. Import the Framework**
+
+In the Package Manager, select TitusGames Framework.
+
+Find the Samples section and click Import next to "Full Framework".
+
+This will copy the code into your project under Assets/Samples/TitusGames Framework/[Version]/FullFramework.
+
+**3. Basic Configuration**
+
+Move the Folder: You are free to move the FullFramework folder anywhere in your Assets directory (e.g., to Assets/_Framework).
+
+Build Settings: Remember to go to File > Build Settings and add your scenes to the Scenes in Build list.
+
+Boot Scene: Always start your game from the scene containing the Boot manager to ensure all systems initialize correctly.
 
 ## 🚀 Features
 
@@ -149,29 +174,42 @@ Plays audio clips by name using files stored inside:
 
 _Framework/Resources/Audio/
 
-### ✔ Add a New Sound
+The AudioManager is generic. You don't need to modify the script to add new sounds; it automatically finds any audio file placed in the correct Resources folder using the filename as a key.
 
-Place .wav or .mp3 files into _Framework/Resources/Audio.
+[!WARNING]
+Manual File Placement Required: By default, the framework is empty. You must manually create the folders and add your audio files for the manager to work.
 
-You can assign the audio files to the script with the inspector:
+### ✔ Folder Structure
+Place your files in these exact paths inside your Resources folder:
+
+Resources/Audio/Music/ (for .mp3, .wav, .ogg music loops)
+
+Resources/Audio/SFX/ (for sound effects)
+
+### ✔ Playing Music
+Music automatically handles cross-fading when switching tracks.
 
 ```csharp
-[SerializeField] private AudioClip placeSound;
+// Plays "MainMenuTheme.mp3" located in Resources/Audio/Music
+AudioManager.Instance.PlayMusic("MainMenuTheme");
 ```
 
-or retrieve them:
+### ✔ Playing Sound Effects (SFX)
+```csharp
+// Plays "click.wav" located in Resources/Audio/SFX
+AudioManager.Instance.PlaySFX("click");
+```
 
 ```csharp
-AudioClip placeSound = Resources.Load<AudioClip>("Audio/place");
+// Play with a specific volume multiplier (e.g., 50% volume)
+AudioManager.Instance.PlaySFX("explosion", 0.5f);
 ```
 
-Use the filename without extension when calling Play.
-
-### ✔ Play a Sound
-AudioManager.Instance.Play(click);
-
-### ✔ Play Music
-AudioManager.Instance.PlayMusic(background);
+### ✔ Volume & Settings
+```csharp
+AudioManager.Instance.SetMusicVolume(0.7f); // Sets music to 70%
+AudioManager.Instance.ToggleSFX(false);      // Mutes all sound effects
+```
 
 # 💬 MessageManager
 

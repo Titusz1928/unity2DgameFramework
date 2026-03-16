@@ -7,134 +7,103 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
-    [Header("Music Clips")]
-    [SerializeField] private AudioClip mainMenuMusic;
-    [SerializeField] private AudioClip gameMusic;
-
-    private AudioClip placeSFX;
+    [Header("Settings")]
+    [SerializeField] private string musicFolderPath = "Audio/Music";
+    [SerializeField] private string sfxFolderPath = "Audio/SFX";
 
     private AudioSource musicSource;
     private AudioSource sfxSource;
+
+    // Dictionaries to hold our clips for fast access
+    private Dictionary<string, AudioClip> musicLibrary = new Dictionary<string, AudioClip>();
+    private Dictionary<string, AudioClip> sfxLibrary = new Dictionary<string, AudioClip>();
 
     private float musicVolume = 1f;
     private float sfxVolume = 1f;
     private bool isMusicOn = true;
     private bool isSFXOn = true;
-    private bool hasStarted = false;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
+        if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Setup audio sources
-        musicSource = GetComponent<AudioSource>();
+        musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.loop = true;
-        musicSource.playOnAwake = false;
 
         sfxSource = gameObject.AddComponent<AudioSource>();
-        sfxSource.loop = false;
-        sfxSource.playOnAwake = false;
 
-        // === Load settings and music ===
         LoadSettings();
-        LoadMusicFromResources();
-
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        InitializeLibrary();
     }
 
-    private void LoadMusicFromResources()
+    private void InitializeLibrary()
     {
-        mainMenuMusic = Resources.Load<AudioClip>("Audio/Music/MainMenuTheme");
-        gameMusic = Resources.Load<AudioClip>("Audio/Music/GameTheme");
+        // Automatically load ALL clips in the specified Resource folders
+        AudioClip[] musicClips = Resources.LoadAll<AudioClip>(musicFolderPath);
+        foreach (var clip in musicClips) musicLibrary[clip.name] = clip;
 
-        // Load SFX files
-        placeSFX = Resources.Load<AudioClip>("Audio/SFX/placeSFX");
-
-        if (mainMenuMusic == null)
-            Debug.LogWarning("MainMenuTheme.mp3 not found in Resources/Audio/Music");
-
-        if (gameMusic == null)
-            Debug.LogWarning("GameTheme.mp3 not found in Resources/Audio/Music");
-
-        if (placeSFX == null)
-            Debug.LogWarning("placeSFX.mp3 not found in Resources/Audio/SFX");
+        AudioClip[] sfxClips = Resources.LoadAll<AudioClip>(sfxFolderPath);
+        foreach (var clip in sfxClips) sfxLibrary[clip.name] = clip;
+        
+        Debug.Log($"AudioLibrary Loaded: {musicLibrary.Count} Music, {sfxLibrary.Count} SFX clips.");
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    // --- GENERIC PUBLIC METHODS ---
+
+    public void PlaySFX(string clipName, float volumeMultiplier = 1f)
     {
-        switch (scene.name)
+        if (!isSFXOn) return;
+
+        if (sfxLibrary.TryGetValue(clipName, out AudioClip clip))
         {
-            case "MainMenu":
-                if (mainMenuMusic != null)
-                {
-                    if (!hasStarted)
-                    {
-                        musicSource.clip = mainMenuMusic;
-                        musicSource.volume = musicVolume;
-                        musicSource.mute = !isMusicOn;
-                        musicSource.Play();
-                        hasStarted = true;
-                    }
-                    else
-                    {
-                        StartCoroutine(FadeToNewTrack(mainMenuMusic));
-                    }
-                }
-                break;
-
-            case "Game":
-                if (gameMusic != null)
-                    StartCoroutine(FadeToNewTrack(gameMusic));
-                break;
+            sfxSource.PlayOneShot(clip, sfxVolume * volumeMultiplier);
+        }
+        else
+        {
+            Debug.LogWarning($"SFX '{clipName}' not found in {sfxFolderPath}");
         }
     }
 
-    public void PlayTestSFX()
+    public void PlayMusic(string clipName, bool fade = true)
     {
-        PlaySFX(placeSFX);
-    }
-
-
-    public void PlaySFX(AudioClip clip, float volumeMultiplier = 1f)
-    {
-        if (clip != null && isSFXOn)
+        if (musicLibrary.TryGetValue(clipName, out AudioClip clip))
         {
-            float finalVolume = Mathf.Clamp01(sfxVolume * volumeMultiplier);
-            sfxSource.PlayOneShot(clip, finalVolume);
+            if (musicSource.clip == clip) return; // Already playing
+
+            if (fade) StartCoroutine(FadeToNewTrack(clip));
+            else SwitchMusicInstant(clip);
         }
     }
 
-    private IEnumerator FadeToNewTrack(AudioClip newClip)
+    private void SwitchMusicInstant(AudioClip clip)
     {
-        float fadeDuration = 1f;
-        float startVolume = musicSource.volume;
-
-        // Fade out
-        for (float t = 0; t < fadeDuration; t += Time.deltaTime)
-        {
-            musicSource.volume = Mathf.Lerp(startVolume, 0f, t / fadeDuration);
-            yield return null;
-        }
-
         musicSource.Stop();
-        musicSource.clip = newClip;
+        musicSource.clip = clip;
         musicSource.mute = !isMusicOn;
         musicSource.Play();
+    }
 
-        // Fade in
+    private System.Collections.IEnumerator FadeToNewTrack(AudioClip newClip)
+    {
+        float fadeDuration = 0.8f;
+        if (musicSource.isPlaying)
+        {
+            for (float t = 0; t < fadeDuration; t += Time.deltaTime)
+            {
+                musicSource.volume = Mathf.Lerp(musicVolume, 0f, t / fadeDuration);
+                yield return null;
+            }
+        }
+
+        SwitchMusicInstant(newClip);
+
         for (float t = 0; t < fadeDuration; t += Time.deltaTime)
         {
             musicSource.volume = Mathf.Lerp(0f, musicVolume, t / fadeDuration);
             yield return null;
         }
-
         musicSource.volume = musicVolume;
     }
 
