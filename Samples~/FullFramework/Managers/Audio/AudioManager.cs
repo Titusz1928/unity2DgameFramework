@@ -77,6 +77,20 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void StopMusic(bool fade = true)
+    {
+        if (fade)
+        {
+        // Start an empty fade (passing null clip)
+        StartCoroutine(FadeToNewTrack(null));
+        }
+        else
+        {
+        musicSource.Stop();
+        musicSource.clip = null;
+        }
+    }
+
     private void SwitchMusicInstant(AudioClip clip)
     {
         musicSource.Stop();

@@ -7,33 +7,34 @@ public class LanguageManager : MonoBehaviour
     [Header("UI References")]
     public TMP_Dropdown dropdown;
 
-    [Header("Language Settings")]
-    public string[] languageCodes = { "hun", "eng" }; // internal codes
-
-    private string PREF_KEY = "language"; // key in PlayerPrefs
+    // Must match the order in LocalizationManager
+    private string[] languageCodes = { "eng", "hun", "ron" }; 
+    private string PREF_KEY = "languageIndex"; // Matched naming with LocalizationManager
 
     void Start()
     {
-        // Load saved language or default to 0
+        // Load saved language or default to 0 (English)
         int savedLang = PlayerPrefs.GetInt(PREF_KEY, 0);
         savedLang = Mathf.Clamp(savedLang, 0, languageCodes.Length - 1);
 
         PopulateDropdown();
         dropdown.value = savedLang;
-        ApplyLanguage(savedLang);
-        UpdateDropdownLabels();
-
+        
         // Listen to dropdown changes
         dropdown.onValueChanged.AddListener(OnLanguageChanged);
+        
+        // Initial label sync
+        UpdateDropdownLabels();
     }
 
     private void PopulateDropdown()
     {
         dropdown.ClearOptions();
-
         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+        
         for (int i = 0; i < languageCodes.Length; i++)
         {
+            // Gets the localized name of the language itself (e.g., "English", "Română")
             string localizedName = LocalizationManager.Instance.GetLocalizedValue(languageCodes[i]);
             options.Add(new TMP_Dropdown.OptionData(localizedName));
         }
@@ -48,40 +49,32 @@ public class LanguageManager : MonoBehaviour
             if (i < dropdown.options.Count)
                 dropdown.options[i].text = LocalizationManager.Instance.GetLocalizedValue(languageCodes[i]);
         }
-
         dropdown.RefreshShownValue();
     }
 
     private void OnLanguageChanged(int index)
     {
-        PlayerPrefs.SetInt(PREF_KEY, index);
-        PlayerPrefs.Save();
-
         ApplyLanguage(index);
-        UpdateDropdownLabels();
     }
 
     private void ApplyLanguage(int index)
     {
-        // Debug log for testing
-        switch (index)
-        {
-            case 0:
-                Debug.Log("Set language to Hungarian");
-                break;
-            case 1:
-                Debug.Log("Set language to English");
-                break;
-        }
+        Debug.Log($"Switching language to: {languageCodes[index]}");
 
-        Sprite infoIcon = Resources.Load<Sprite>("UI/Icons/info2");
-        MessageManager.Instance.ShowMessage("testmessage", infoIcon);
-
-        // Update LocalizationManager
+        // Update the actual localization system
         LocalizationManager.Instance.SetLanguageIndex(index);
+        
+        // Visual feedback
+        UpdateDropdownLabels();
+
+        // Test message example
+        Sprite infoIcon = Resources.Load<Sprite>("UI/Icons/info2");
+        if (MessageManager.Instance != null)
+            MessageManager.Instance.ShowMessage("testmessage", infoIcon);
     }
 
-    // Optional helper methods if you want buttons to switch languages
-    public void SelectHungarian() => ApplyLanguage(0);
-    public void SelectEnglish() => ApplyLanguage(1);
+    // Helper methods for specific buttons
+    public void SelectEnglish() => OnLanguageChanged(0);
+    public void SelectHungarian() => OnLanguageChanged(1);
+    public void SelectRomanian() => OnLanguageChanged(2);
 }

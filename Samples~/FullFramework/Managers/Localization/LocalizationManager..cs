@@ -12,7 +12,7 @@ public class LocalizationManager : MonoBehaviour
     public string resourcesFolder = "Languages";
 
     [Tooltip("Language codes, must match filenames inside Resources/Languages (without extension). Order should match your dropdown indices.")]
-    public string[] languageCodes = new string[] { "hun", "eng" };
+    public string[] languageCodes = new string[] { "eng", "hun", "ron" };
 
     [Tooltip("Key used in PlayerPrefs for saving selected language index")]
     public string prefsKey = "languageIndex";
@@ -40,8 +40,10 @@ public class LocalizationManager : MonoBehaviour
     /// </summary>
     public void Initialize()
     {
+        // Default to index 0 (English) if no preference is saved
         int savedIndex = PlayerPrefs.GetInt(prefsKey, 0);
         savedIndex = Mathf.Clamp(savedIndex, 0, languageCodes.Length - 1);
+        
         LoadLanguage(languageCodes[savedIndex]);
         Debug.Log($"LocalizationManager initialized with language: {CurrentLanguageCode}");
     }

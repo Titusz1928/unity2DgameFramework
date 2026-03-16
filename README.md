@@ -187,7 +187,18 @@ Resources/Audio/Music/ (for .mp3, .wav, .ogg music loops)
 
 Resources/Audio/SFX/ (for sound effects)
 
-### ✔ Playing Music
+### ✔ Playing Music (The Easy Way)
+The framework includes a MusicTrigger script so you can set up music without writing code:
+
+Create an Empty GameObject in your scene.
+
+Attach the MusicTrigger script.
+
+Type the Filename (without extension) in the Track Name field.
+
+(Optional) Check Stop On Scene Exit if you want the music to silence when leaving this scene.
+
+### ✔ Playing Music (Via Code)
 Music automatically handles cross-fading when switching tracks.
 
 ```csharp
