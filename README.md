@@ -36,12 +36,29 @@ Boot Scene: Always start your game from the scene containing the Boot manager to
 
 ## 🚀 Features
 
-- **BootManager** – initializes all other managers automatically; no need to manually place managers in new scenes.  
+- **BootManager** – initializes all other managers automatically; no need to manually place managers in new scenes.
+- **Sandbox Mode** – A dedicated testing environment that mirrors the Boot sequence for isolated development.  
 - **SceneManager** – easily navigate between scenes and exit the game.  
 - **WindowManager** – create UI windows and open them from buttons.  
 - **LocalizationManager** – localize any TextMeshPro UI element with JSON files.  
 - **AudioManager** – play SFX and music stored inside the framework’s audio folder.
 - **MessageManager** – make messages appear.
+
+---
+
+## 🧪 Sandbox & Team Workflow
+
+The newest update introduces the **Sandbox Scene**. This is designed specifically for **collaborative environments** where multiple people are working on different features simultaneously.
+
+### Why use the Sandbox?
+In a team, editing the "Main" or "Boot" scene frequently leads to Git merge conflicts. The Sandbox allows you to:
+
+* **Isolated Testing:** Create your own "Test" scene to build a specific mechanic without touching the production flow.
+* **Full System Access:** The Sandbox automatically loads the Audio, Window, Localization, and Scene managers, just like the real Boot scene.
+* **Zero Setup:** Simply open the Sandbox scene and start dragging your new prefabs or scripts in; the framework backbone is already initialized and running.
+
+> [!TIP]
+> **Best Practice:** Keep the `Boot` scene reserved for the final game flow and use `Sandbox` (or duplicates of it) for daily development, prototyping, and isolated feature testing.
 
 ---
 
