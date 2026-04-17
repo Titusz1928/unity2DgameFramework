@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Samples~/FullFramework/UI/Sprites/logo1.png" width="300" alt="Framework Logo">
+  <img src="Samples~/TitusGamesFramework/UI/Sprites/logo1.png" width="300" alt="Framework Logo">
 </p>
 
 # TitusGames Framework
