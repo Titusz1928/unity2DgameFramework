@@ -1,9 +1,9 @@
 {
   "name": "com.titusgames.framework",
   "displayName": "TitusGames Framework",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "unity": "6000.0",
-  "description": "A reusable Unity framework for 2D android games with scene, window, messagebox, localization, and audio management.",
+  "description": "A reusable Unity framework for 2D and 3D games with scene, window, messagebox, localization, and audio management.",
   "author": {
     "name": "TitusGames",
     "email": "titusgames.studios@gmail.com"
@@ -13,9 +13,14 @@
   },
   "samples": [
     {
-      "displayName": "Full Framework",
-      "description": "Copies all framework scripts into Assets/_Framework",
-      "path": "Samples~/TitusGamesFramework"
+      "displayName": "2D Starter Framework",
+      "description": "The standard 2D setup with Orthographic cameras and 2D lighting.",
+      "path": "Samples~/TitusGamesFramework2D"
+    },
+    {
+      "displayName": "3D Starter Framework",
+      "description": "A 3D optimized setup with Perspective cameras, Skybox, and 3D lighting.",
+      "path": "Samples~/TitusGamesFramework3D"
     }
   ]
 }

@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="Samples~/TitusGamesFramework/UI/Sprites/logo1.png" width="300" alt="Framework Logo">
+  <img src="Media/logo1.png" width="300" alt="Framework Logo">
 </p>
 
 # TitusGames Framework
 
-A reusable Unity framework for 2D games, providing ready-made systems for Booting, Scene Management, Windows/UI, Localization, Audio and in-game messages/notifications.  
+A reusable Unity framework for **2D and 3D** games, providing ready-made systems for Booting, Scene Management, Windows/UI, Localization, Audio, and in-game messages/notifications.  
 The framework is designed to help you rapidly build consistent projects without rewriting core systems every time.
 
 ---
@@ -16,15 +16,14 @@ Open Unity and go to Window > Package Manager.
 
 Click the + button and select Add package from git URL...
 
-Paste your repository URL: https://github.com/Titusz1928/unity2DgameFramework.git
+Paste your repository URL: https://github.com/Titusz1928/TitusGames-Framework.git
 
 **2. Import the Framework**
-
-In the Package Manager, select TitusGames Framework.
-
-Find the Samples section and click Import next to "Full Framework".
-
-This will copy the code into your project under Assets/Samples/TitusGames Framework/[Version]/FullFramework.
+* In the Package Manager, select **TitusGames Framework**.
+* Find the **Samples** section. You will see two options:
+    * **2D Starter Framework:** Optimized for 2D projects (Orthographic cameras, 2D lighting).
+    * **3D Starter Framework:** Optimized for 3D projects (Perspective cameras, Skybox, 3D lighting).
+* Click **Import** next to your preferred version.
 
 **3. Basic Configuration**
 
@@ -37,6 +36,7 @@ Boot Scene: Always start your game from the scene containing the Boot manager to
 ## 🚀 Features
 
 - **BootManager** – initializes all other managers automatically; no need to manually place managers in new scenes.
+- **2D & 3D Support** – Includes pre-configured sample scenes for both dimensions.
 - **Sandbox Mode** – A dedicated testing environment that mirrors the Boot sequence for isolated development.  
 - **SceneManager** – easily navigate between scenes and exit the game.  
 - **WindowManager** – create UI windows and open them from buttons.  
@@ -85,6 +85,12 @@ _Framework/<br>
 │ └── (JSON files for each language)<br>
 │<br>
 ├── Scenes/<br>
+
+│ └── TestingScenes/<br>
+│ │ └── Sandbox.unity<br>
+│ ├── Boot.unity<br>
+│ ├── MainMenu.unity<br>
+│ ├── Game.unity<br>
 │<br>
 └── ThirdParty/<br>
 └── Utils/<br>
