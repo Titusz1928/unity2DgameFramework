@@ -2,7 +2,7 @@
   <img src="Media~/logo1.png" width="300" alt="Framework Logo">
 </p>
 
-# TitusGames Framework (v2.0.1)
+# TitusGames Framework (v2.1.0)
 
 A modular, enterprise-ready Unity package designed for rapid **2D and 3D** game assembly. It includes streamlined subsystems for lifecycle initialization, scene routing, nested window management, deep localization streaming, dynamic audio mixing, and queue-driven messaging overlays.
 
