@@ -11,18 +11,21 @@ public class LanguageManager : MonoBehaviour
 
 
     private string PREF_KEY = "languageIndex"; // Matched naming with LocalizationManager
+        private ILocalizationService _localizationService;
 
         void Start()
         {
-            if (LocalizationManager.Instance == null)
+            _localizationService = ServiceLocator.Current.Get<ILocalizationService>();
+
+            if (_localizationService == null)
             {
-                Debug.LogError("[LanguageManager] Cannot initialize: LocalizationManager Instance missing from scene context.");
+                Debug.LogError("[LanguageManager] Cannot initialize: ILocalizationService missing from ServiceLocator framework context.");
                 return;
             }
 
             // Read the total available configurations directly from the initialized manager lists
             int savedLang = PlayerPrefs.GetInt(PREF_KEY, 0);
-            savedLang = Mathf.Clamp(savedLang, 0, Mathf.Max(0, LocalizationManager.Instance.languageCodes.Count - 1));
+            savedLang = Mathf.Clamp(savedLang, 0, Mathf.Max(0, _localizationService.LanguageCodes.Count - 1));
 
             PopulateDropdown();
 
@@ -41,7 +44,7 @@ public class LanguageManager : MonoBehaviour
             List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
 
             // Generate temporary placeholder options based on length
-            int count = LocalizationManager.Instance.languageCodes.Count;
+            int count = _localizationService.LanguageCodes.Count;
             for (int i = 0; i < count; i++)
             {
                 options.Add(new TMP_Dropdown.OptionData(""));
@@ -53,14 +56,14 @@ public class LanguageManager : MonoBehaviour
 
         private void UpdateDropdownLabels()
         {
-            var codes = LocalizationManager.Instance.languageCodes;
+            var codes = _localizationService.LanguageCodes;
 
             for (int i = 0; i < codes.Count; i++)
             {
                 if (i < dropdown.options.Count)
                 {
                     // Live Localized Value Search: Ask the system how to say the language code inside the current language context!
-                    string liveLocalizedName = LocalizationManager.Instance.GetLocalizedValue(codes[i]);
+                    string liveLocalizedName = _localizationService.GetLocalizedValue(codes[i]);
 
                     // If the active translation dictionary doesn't have it, fallback to its code
                     if (liveLocalizedName.StartsWith("[MISSING:"))
@@ -83,15 +86,12 @@ public class LanguageManager : MonoBehaviour
 
         private void ApplyLanguage(int index)
         {
-            if (index < 0 || index >= LocalizationManager.Instance.languageCodes.Count) return;
+            if (index < 0 || index >= _localizationService.LanguageCodes.Count) return;
 
-            Debug.Log($"[LanguageManager] UI switching system context to code: {LocalizationManager.Instance.languageCodes[index]}");
+            Debug.Log($"[LanguageManager] UI switching system context to code: {_localizationService.LanguageCodes[index]}");
 
-            LocalizationManager.Instance.SetLanguageIndex(index);
+            _localizationService.SetLanguageIndex(index);
             UpdateDropdownLabels();
-
-            /*if (MessageManager.Instance != null)
-                MessageManager.Instance.ShowMessage("testmessage");*/
         }
 
         /// <summary>

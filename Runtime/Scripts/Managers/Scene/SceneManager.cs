@@ -3,21 +3,11 @@ using UnityEngine.SceneManagement;
 
 namespace TitusGames.Framework
 {
-public class SceneManagerEX : MonoBehaviour
+public class SceneManagerEX : MonoBehaviour, ISceneService
 {
-    public static SceneManagerEX Instance;
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
     }
 
     public void LoadScene(string sceneName)

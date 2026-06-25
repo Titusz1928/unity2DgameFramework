@@ -3,41 +3,63 @@ using UnityEngine;
 
 namespace TitusGames.Framework
 {
-[RequireComponent(typeof(TextMeshProUGUI))]
-public class LocalizedText : MonoBehaviour
-{
-    public string key; // e.g. "title"
-
-    private TextMeshProUGUI textComponent;
-
-    private void Awake()
+    [RequireComponent(typeof(TextMeshProUGUI))]
+    public class LocalizedText : MonoBehaviour
     {
-        textComponent = GetComponent<TextMeshProUGUI>();
-    }
+        public string key;
 
-    private void OnEnable()
-    {
-        UpdateText();
-        LocalizationManager.OnLanguageChanged += UpdateText; // subscribe
-    }
+        private TextMeshProUGUI textComponent;
+        private ILocalizationService _localizationService;
 
-    private void OnDisable()
-    {
-        LocalizationManager.OnLanguageChanged -= UpdateText; // unsubscribe
-    }
-
-    private void UpdateText()
-    {
-        if (textComponent != null && LocalizationManager.Instance != null)
+        private void Awake()
         {
-            textComponent.text = LocalizationManager.Instance.GetLocalizedValue(key);
+            textComponent = GetComponent<TextMeshProUGUI>();
+        }
+
+        private void Start()
+        {
+            // Initial translation grab when first booting or spawning
+            if (_localizationService == null)
+            {
+                _localizationService = ServiceLocator.Current.Get<ILocalizationService>();
+            }
+            UpdateText();
+        }
+
+        private void OnEnable()
+        {
+            if (_localizationService == null)
+            {
+                _localizationService = ServiceLocator.Current.Get<ILocalizationService>();
+            }
+
+            if (_localizationService != null)
+            {
+                UpdateText();
+                _localizationService.OnLanguageChanged += UpdateText; // Subscribe to instance event
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_localizationService != null)
+            {
+                _localizationService.OnLanguageChanged -= UpdateText; // Unsubscribe to prevent memory leaks
+            }
+        }
+
+        private void UpdateText()
+        {
+            if (textComponent != null && _localizationService != null)
+            {
+                textComponent.text = _localizationService.GetLocalizedValue(key);
+            }
+        }
+
+        public void SetKey(string newKey)
+        {
+            key = newKey;
+            UpdateText();
         }
     }
-
-    public void SetKey(string newKey)
-    {
-        key = newKey;
-        UpdateText();
-    }
-}
 }

@@ -10,21 +10,33 @@ Version 2.0.0 migrates the entire framework core code to an optimized, decoupled
 
 ---
 
-## Update 2.0:
+## Update 2.1.0:
 
-### 🏗 Architectural Paradigm: The `Runtime` Layer
+### 🔌 Transition: From Singletons to Service Locator
 
-The framework utilizes a professional modular architecture. To maintain project cleanliness and prevent source-code collision, system logic is strictly decoupled from local assets. 
+In version 2.1.0, we have systematically eliminated all static Instance singletons in favor of a centralized Service Locator pattern. This shift transforms your project from a collection of "hidden global dependencies" into a clean, interface-driven service registry.
 
-The core engine is structured cleanly inside the invisible package directory:
+#### Why this change?
+* **Explicit Dependency Management**: Systems no longer rely on "magic" global static fields. Dependencies are now explicitly requested through the ServiceLocator, making it clear which systems rely on which services.
 
-```text
-com.titusgames.framework/
-├── Runtime/
-│   ├── Scripts/     # Pre-compiled managers bounded by TitusGames.Framework.asmdef
-│   └── Resources/   # Package defaults (e.g., DefaultMessagePrefab, fallback language data)
-├── Samples~/        # Hidden source files imported safely via the Package Manager UI
-└── Media~/          # Static branding and logo assets
+* **Composition Root Initialization**: By centralizing system creation in Boot and SandboxInitializer, we have removed the unpredictability of Awake and Start execution orders. You now have total control over the lifecycle of your global infrastructure.
+
+* **Interface-Driven Design**: Managers now implement interfaces (e.g., IMessageService). You can now swap concrete implementations for testing or platform-specific versions without modifying the consumer code.
+
+* **No More Zombie References**: By moving away from DontDestroyOnLoad singletons toward explicit registration, we have mitigated the file-locking and memory-leak issues commonly associated with Unity package removal.
+
+#### Migration Workflow
+If you are upgrading from 2.0.x, replace all instances of static access with the new service registry:
+
+Before (Singleton):
+
+```c#
+MessageManager.Instance.ShowMessage("Hello World");
+```
+After (Service Locator):
+
+```c#
+ServiceLocator.Current.Get<IMessageService>().ShowMessage("Hello World");
 ```
 
 ## ⚙ Installation & Setup
@@ -98,40 +110,41 @@ In a team, editing the "Main" or "Boot" scene frequently leads to Git merge conf
 ---
 
 ## 📂 Project Structure
+The framework is bifurcated into two distinct zones: the Package Scope (Core Logic) and the Asset Scope (User Implementation/Samples).
 
-_Framework/<br>
-│<br>
-├── Managers/<br>
-│ ├── Boot.cs<br>
-│ ├── SceneManager.cs<br>
-│ ├── WindowManager.cs<br>
-│ ├── LocalizationManager.cs<br>
-│ └── AudioManager.cs<br>
-│ └── MessageManager.cs<br>
-│<br>
-├── UI/<br>
-│ └── Windows/<br>
-│ └── (Your Window Scripts + Prefabs)<br>
-│<br>
-├── Resources/<br>
-│ ├── Audio/<br>
-│ │ └── (Place your .wav / .mp3 files here)<br>
-│ └── Languages/<br>
-│ └── (JSON files for each language)<br>
-│<br>
-├── Scenes/<br>
+### 1. The Package (Core Logic)
+Located in Packages/com.titusgames.framework/, this area contains the source code. You should not modify these files directly if you intend to maintain portability.
 
-│ └── TestingScenes/<br>
-│ │ └── Sandbox.unity<br>
-│ ├── Boot.unity<br>
-│ ├── MainMenu.unity<br>
-│ ├── Game.unity<br>
-│<br>
-└── ThirdParty/<br>
-└── Utils/<br>
-└── MiniJSON (for localization)<br>
+```text
+com.titusgames.framework/
+├── Runtime/
+│   └── Scripts/               # Core framework services (ASMDEF-bound)
+│       ├── Managers/          # Service implementations (Audio, Boot, Localization, etc.)
+|       ├── Others/            # Other scripts
+│       └── ThirdParty/        # External utilities (e.g., MiniJSON)
+└── Media~/                    # Branding and internal icons
+```
+### 2. The Assets (Samples & Implementation)
 
+Located in Assets/Samples/TitusGamesFramework/, this folder contains the content that your end-users will actually edit. When you import a sample, Unity copies these files into your Assets folder so they can be easily modified without altering the core package.
 
+```text
+Assets/Samples/TitusGamesFramework/
+├── TitusGamesFramework2D/      # 2D-specific implementation templates
+│   ├── Prefabs/               # UI/Game instance templates
+│   ├── Resources/             # Audio, Languages, and UI/Messaging definitions
+│   ├── Scenes/                # Testing sandbox and boilerplate scenes
+│   └── UI/                    # Sprites, Window layouts, and UI components
+│
+└── TitusGamesFramework3D/      # 3D-specific implementation templates
+    └── (Same structure as 2D)
+```
+Key Structural Concepts
+~ (Tilde) Folders: Folders like Samples~ and Media~ are ignored by Unity’s import process, preventing unnecessary overhead in your production builds.
+
+ASMDEF Boundaries: The code in Runtime/Scripts is strictly separated from your Assembly-CSharp.dll using Assembly Definitions (.asmdef). This ensures that your game code cannot accidentally become dependent on internal manager implementation details, forcing you to use the ServiceLocator interface approach.
+
+Resource Management: All Resources/ folders are kept inside your Samples directory. This ensures that the framework remains "clean"—it doesn't pollute the global Resources path until you explicitly import the samples into your Assets folder.
 
 ---
 

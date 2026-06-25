@@ -25,9 +25,12 @@ namespace TitusGames.Framework
         };
 
         private Coroutine testRoutine;
+        private IMessageService _messageService;
 
         private void Start()
         {
+            _messageService = ServiceLocator.Current.Get<IMessageService>();
+
             if (runOnStart)
             {
                 StartTestingLoop();
@@ -67,10 +70,14 @@ namespace TitusGames.Framework
         [ContextMenu("Trigger Single Random Scenario")]
         public void TriggerRandomScenario()
         {
-            if (MessageManager.Instance == null)
+            if (_messageService == null)
             {
-                Debug.LogError("[MessageTester] MessageManager.Instance is missing from scene environment.");
-                return;
+                _messageService = ServiceLocator.Current.Get<IMessageService>();
+                if (_messageService == null)
+                {
+                    Debug.LogError("[MessageTester] IMessageService is missing from the ServiceLocator context framework.");
+                    return;
+                }
             }
 
             // Pick a scenario index from 0 to 4
@@ -83,21 +90,21 @@ namespace TitusGames.Framework
                     // 1. ABSOLUTE DEFAULT: Test parameter omission.
                     // Both fields fallback entirely to Inspector configurations inside the manager.
                     Debug.Log($"[MessageTester] Scenario 0: Omitted parameters -> \"{phrase}\"");
-                    MessageManager.Instance.ShowMessageDirectly(phrase);
+                    _messageService.ShowMessageDirectly(phrase);
                     break;
 
                 case 1:
                     // 2. SPECIFYING ICON ONLY: Test default prefab fallback alongside custom data.
                     string targetIcon = customIcons[Random.Range(0, customIcons.Length)];
                     Debug.Log($"[MessageTester] Scenario 1: Default Prefab + Custom Icon ('{targetIcon}') -> \"{phrase}\"");
-                    MessageManager.Instance.ShowMessageDirectly(phrase, iconName: targetIcon);
+                    _messageService.ShowMessageDirectly(phrase, iconName: targetIcon);
                     break;
 
                 case 2:
                     // 3. SPECIFYING PREFAB ONLY: Leave icon string empty, should load default icon inside custom layout.
                     string targetPrefab = customPrefabs[Random.Range(0, customPrefabs.Length)];
                     Debug.Log($"[MessageTester] Scenario 2: Custom Prefab ('{targetPrefab}') + Default Icon -> \"{phrase}\"");
-                    MessageManager.Instance.ShowMessageDirectly(phrase, customPrefabName: targetPrefab);
+                    _messageService.ShowMessageDirectly(phrase, customPrefabName: targetPrefab);
                     break;
 
                 case 3:
@@ -105,7 +112,7 @@ namespace TitusGames.Framework
                     string overIcon = customIcons[Random.Range(0, customIcons.Length)];
                     string overPrefab = customPrefabs[Random.Range(0, customPrefabs.Length)];
                     Debug.Log($"[MessageTester] Scenario 3: Complete Parameter Override (Prefab: '{overPrefab}', Icon: '{overIcon}') -> \"{phrase}\"");
-                    MessageManager.Instance.ShowMessageDirectly(phrase, overIcon, overPrefab);
+                    _messageService.ShowMessageDirectly(phrase, overIcon, overPrefab);
                     break;
 
                 case 4:
@@ -114,12 +121,12 @@ namespace TitusGames.Framework
                     if (runtimeCustomSprite == null)
                     {
                         Debug.LogWarning("[MessageTester] Scenario 4 skipped because 'runtimeCustomSprite' field is unassigned in the inspector. Running Scenario 0 fallback instead.");
-                        MessageManager.Instance.ShowMessageDirectly(phrase);
+                        _messageService.ShowMessageDirectly(phrase);
                     }
                     else
                     {
                         Debug.Log($"[MessageTester] Scenario 4: Direct Sprite Injection (Prefab: '{spritePrefab}') -> \"{phrase}\"");
-                        MessageManager.Instance.ShowMessageWithSprite(phrase, runtimeCustomSprite, customPrefabName: spritePrefab, useLocalization: false);
+                        _messageService.ShowMessageWithSprite(phrase, runtimeCustomSprite, customPrefabName: spritePrefab, useLocalization: false);
                     }
                     break;
             }

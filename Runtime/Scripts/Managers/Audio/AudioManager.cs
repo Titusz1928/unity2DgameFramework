@@ -6,15 +6,11 @@ namespace TitusGames.Framework
 {
 
 [RequireComponent(typeof(AudioSource))]
-public class AudioManager : MonoBehaviour
+public class AudioManager : MonoBehaviour, IAudioService
 {
-    public static AudioManager Instance { get; private set; }
 
     [Header("Resource Folder Paths")]
-    [Tooltip("Path relative to any Resources folder where your music tracks are located.")]
     public string musicFolderPath = "Audio/Music";
-
-    [Tooltip("Path relative to any Resources folder where your sound effects are located.")]
     public string sfxFolderPath = "Audio/SFX";
 
     [Header("Pool Settings")]
@@ -31,27 +27,22 @@ public class AudioManager : MonoBehaviour
     private float sfxVolume = 1f;
     private bool isMusicOn = true;
     private bool isSFXOn = true;
-
     private string currentTrackName;
 
     private void Awake()
     {
-        if (Instance != null) { Destroy(gameObject); return; }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.loop = true;
 
         for (int i = 0; i < sfxSourcePoolSize; i++)
         {
             AudioSource source = gameObject.AddComponent<AudioSource>();
-            source.spatialBlend = 0f; // 2D 
+            source.spatialBlend = 0f;
             source.ignoreListenerPause = true;
             sfxPool.Add(source);
         }
 
-        LoadSettings();
+     LoadSettings();
     }
 
         private AudioClip GetOrCreateAudioClip(string clipName, bool isMusic)

@@ -7,9 +7,8 @@ using UnityEngine.UI;
 
 namespace TitusGames.Framework
 {
-public class MessageManager : MonoBehaviour
+public class MessageManager : MonoBehaviour, IMessageService
 {
-    public static MessageManager Instance { get; private set; }
 
     [Header("Hierarchy Containers")]
     public RectTransform messageContainer;
@@ -44,9 +43,6 @@ public class MessageManager : MonoBehaviour
 
         private void Awake()
         {
-            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
         private void Start()
@@ -226,16 +222,35 @@ public class MessageManager : MonoBehaviour
         var textObj = msgInstance.transform.Find("MessageText");
         if (textObj != null)
         {
+            var loc = textObj.GetComponent<LocalizedText>();
+            var tmp = textObj.GetComponent<TextMeshProUGUI>();
+
             if (data.isLocalized)
             {
-                var loc = textObj.GetComponent<LocalizedText>();
-                if (loc != null) loc.SetKey(data.text);
+               // Ensure the component is active and set the key
+                if (loc != null) 
+                 {
+                      loc.enabled = true;
+                      loc.SetKey(data.text);
+                }
+                // Fallback: If someone forgot to put a LocalizedText script on the prefab
+                 else if (tmp != null) 
+                {
+                     tmp.text = data.text;
+                }
             }
             else
             {
-                var tmp = textObj.GetComponent<TextMeshProUGUI>();
-                if (tmp != null) tmp.text = data.text;
-            }
+                    if (loc != null)
+                    {
+                        loc.enabled = false;
+                    }
+
+                    if (tmp != null)
+                    {
+                        tmp.text = data.text;
+                    }
+                }
         }
 
         // 2. Extract and Apply Icon

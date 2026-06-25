@@ -5,10 +5,8 @@ using MiniJSON;
 
 namespace TitusGames.Framework
 {
-public class LocalizationManager : MonoBehaviour
+public class LocalizationManager : MonoBehaviour, ILocalizationService
 {
-    public static LocalizationManager Instance { get; private set; }
-
     [Header("Localization Settings")]
     [Tooltip("Folder inside Resources where language json files live (e.g. Resources/Languages)")]
     public string resourcesFolder = "Languages";
@@ -19,27 +17,23 @@ public class LocalizationManager : MonoBehaviour
    [Tooltip("Key used in PlayerPrefs for saving selected language index")]
     public string prefsKey = "languageIndex";
 
-   // Dynamic lists resolved directly from the config file
-    [HideInInspector] public List<string> languageCodes = new List<string>();
-    [HideInInspector] public List<string> languageDisplayNames = new List<string>();
+        // Exposing implementation variables through Interface properties
+        public List<string> LanguageCodes => languageCodes;
+        public List<string> LanguageDisplayNames => languageDisplayNames;
+        public string CurrentLanguageCode { get; private set; } = "eng";
 
-    private Dictionary<string, string> localizedText = new Dictionary<string, string>();
-    public static event Action OnLanguageChanged;
+        [HideInInspector] public List<string> languageCodes = new List<string>();
+        [HideInInspector] public List<string> languageDisplayNames = new List<string>();
 
-    public string CurrentLanguageCode { get; private set; } = "eng";
+        private Dictionary<string, string> localizedText = new Dictionary<string, string>();
 
-    // --- Singleton setup ---
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
+        public event Action OnLanguageChanged;
+
+        // --- Singleton setup ---
+        private void Awake()
         {
-            Destroy(gameObject);
-            return;
-        }
 
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
+        }
 
         /// <summary>
         /// Reads configuration rules out of your project assets folder and boots languages.

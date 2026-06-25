@@ -6,25 +6,18 @@ using UnityEngine.SceneManagement;
 
 namespace TitusGames.Framework{
 
-public class WindowManager : MonoBehaviour, ICancelInputHandler
+public class WindowManager : MonoBehaviour,IWindowService, ICancelInputHandler
 {
-    public static WindowManager Instance { get; private set; }
 
     [Header("Window Parent")]
     public Transform uiRoot;  // Canvas content target
 
     [Header("Global Input Settings")]
-    [Tooltip("If true, Escape key on keyboard will always attempt to close top window if no custom PlayerInput is registered.")]
     [SerializeField] private bool useUniversalKeyboardFallback = true;
 
     [Header("Dynamic Input Naming Configuration")]
-    [Tooltip("The name of your UI/Interface Action Map.")]
     public string uiActionMapName = "UI";
-        
-    [Tooltip("The name of your gameplay/character Action Map.")]
     public string playerActionMapName = "Player";
-        
-    [Tooltip("The full action map path to bind for canceling/closing windows.")]
     public string cancelActionPath = "UI/Cancel";
 
     private Stack<GameObject> windowStack = new Stack<GameObject>();
@@ -49,14 +42,6 @@ public class WindowManager : MonoBehaviour, ICancelInputHandler
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void OnEnable()
@@ -141,20 +126,18 @@ public class WindowManager : MonoBehaviour, ICancelInputHandler
 
     public bool HandleCancel()
     {
-        // Step 1: Handle open window layer hierarchies
         if (IsAnyWindowOpen)
         {
             CloseTopWindow();
-            return true; // Input fully consumed!
+            return true;
         }
 
-        // Step 2: Pass down the chain to other game state handlers (e.g. gameplay pause menus)
         if (nextHandler != null)
         {
             return nextHandler.HandleCancel();
         }
 
-        return false;
+         return false;
     }
 
     // --- Core Window Operations ---

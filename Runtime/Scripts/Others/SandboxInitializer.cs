@@ -1,64 +1,89 @@
 using UnityEngine;
 
-
-namespace TitusGames.Framework{
-public class SandboxInitializer : MonoBehaviour
+namespace TitusGames.Framework
 {
-    void Awake()
+    public class SandboxInitializer : MonoBehaviour
     {
-        InitializeGlobalManagers();
-    }
-
-    private void InitializeGlobalManagers()
-    {
-        // 1. Essential Navigation & UI Managers
-        EnsureManager<SceneManagerEX>("SceneManager");
-        EnsureManager<WindowManager>("WindowManager");
-
-        // 2. Localization (Infrastructure)
-        if (LocalizationManager.Instance == null)
+        private void Awake()
         {
-            var locObj = new GameObject("LocalizationManager");
-            var locManager = locObj.AddComponent<LocalizationManager>();
-            DontDestroyOnLoad(locObj);
-            locManager.Initialize();
+            InitializeGlobalManagers();
         }
 
-        // 3. Audio (Infrastructure)
-        if (AudioManager.Instance == null)
+        private void InitializeGlobalManagers()
         {
-            var audioObj = new GameObject("AudioManager");
-            audioObj.AddComponent<AudioManager>();
-            DontDestroyOnLoad(audioObj);
+            // Initialize infrastructure registry container
+            ServiceLocator.Initialize();
+
+            // 1. Scene Service
+            GetOrRegisterService<ISceneService>("SceneManagerEX", () =>
+            {
+                var sceneObj = new GameObject("SceneManagerEX");
+                var service = sceneObj.AddComponent<SceneManagerEX>();
+                DontDestroyOnLoad(sceneObj);
+                return service;
+            });
+
+            // 2. Window Service
+            GetOrRegisterService<IWindowService>("WindowManager", () =>
+            {
+                var windowObj = new GameObject("WindowManager");
+                var service = windowObj.AddComponent<WindowManager>();
+                DontDestroyOnLoad(windowObj);
+                return service;
+            });
+
+            // 3. Localization Service
+            var localizationService = GetOrRegisterService<ILocalizationService>("LocalizationManager", () =>
+            {
+                var locObj = new GameObject("LocalizationManager");
+                var service = locObj.AddComponent<LocalizationManager>();
+                DontDestroyOnLoad(locObj);
+                return service;
+            });
+            localizationService.Initialize();
+
+            // 4. Audio Service
+            GetOrRegisterService<IAudioService>("AudioManager", () =>
+            {
+                var audioObj = new GameObject("AudioManager");
+                var service = audioObj.AddComponent<AudioManager>();
+                DontDestroyOnLoad(audioObj);
+                return service;
+            });
+
+            // 5. Message Service
+            GetOrRegisterService<IMessageService>("MessageManager", () =>
+            {
+                var msgObj = new GameObject("MessageManager");
+                var service = msgObj.AddComponent<MessageManager>();
+                DontDestroyOnLoad(msgObj);
+
+                var container = GameObject.Find("MessageContainer");
+                if (container != null)
+                    service.RegisterContainer(container.GetComponent<RectTransform>());
+
+                return service;
+            });
+
+            Debug.Log("<color=cyan>[Sandbox] Global Infrastructure & Services Initialized Cleanly via ServiceLocator.</color>");
         }
 
-        // 4. Messaging System (Global UI)
-        InitializeMessageManager();
-
-        Debug.Log("<color=cyan>[Sandbox] Global Infrastructure Initialized.</color>");
-    }
-
-    private void InitializeMessageManager()
-    {
-        if (MessageManager.Instance != null) return;
-
-        var msgObj = new GameObject("MessageManager");
-        var mm = msgObj.AddComponent<MessageManager>();
-        DontDestroyOnLoad(msgObj);
-
-        var container = GameObject.Find("MessageContainer");
-        if (container != null)
-            mm.messageContainer = container.GetComponent<RectTransform>();
-    }
-
-    private void EnsureManager<T>(string name) where T : MonoBehaviour
-    {
-        if (Object.FindFirstObjectByType<T>() == null)
+        /// <summary>
+        /// Attempts to fetch a service from the service locator registry container. 
+        /// If missing, triggers a factory callback routine to build and register it safely.
+        /// </summary>
+        private T GetOrRegisterService<T>(string name, System.Func<T> factory) where T : class
         {
-            var obj = new GameObject(name);
-            obj.AddComponent<T>();
-            DontDestroyOnLoad(obj);
+            try
+            {
+                return ServiceLocator.Current.Get<T>();
+            }
+            catch
+            {
+                T service = factory();
+                ServiceLocator.Current.Register<T>(service);
+                return service;
+            }
         }
     }
-}
 }

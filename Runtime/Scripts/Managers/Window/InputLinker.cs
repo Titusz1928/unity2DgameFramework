@@ -8,6 +8,7 @@ namespace TitusGames.Framework
     public class InputLinker : MonoBehaviour
     {
         private PlayerInput playerInput;
+        private IWindowService _windowService;
 
         private void Awake()
         {
@@ -16,19 +17,13 @@ namespace TitusGames.Framework
 
         private void Start()
         {
-            if (WindowManager.Instance != null)
-            {
-                WindowManager.Instance.RegisterPlayerInput(playerInput);
-            }
+            _windowService = ServiceLocator.Current.Get<IWindowService>();
+            _windowService?.RegisterPlayerInput(playerInput);
         }
 
         private void OnDestroy()
         {
-            if (WindowManager.Instance != null)
-            {
-                // Cleanly unregister this input context if destroyed/scene changes
-                WindowManager.Instance.RegisterPlayerInput(null);
-            }
+            _windowService?.RegisterPlayerInput(null);
         }
     }
 }

@@ -8,7 +8,12 @@ namespace TitusGames.Framework
 
         private void Start()
         {
-            WindowManager.Instance.RegisterUIRoot(windowRoot);
+            var windowService = ServiceLocator.Current.Get<IWindowService>();
+
+            if (windowService != null)
+            {
+                windowService.RegisterUIRoot(windowRoot);
+            }
         }
     }
 }

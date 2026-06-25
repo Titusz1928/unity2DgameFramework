@@ -1,12 +1,19 @@
 using UnityEngine;
 
 namespace TitusGames.Framework
-{ 
-public class UI_CloseWindow : MonoBehaviour
 {
-    public void Close()
+    public class UI_CloseWindow : MonoBehaviour
     {
-        WindowManager.Instance.CloseTopWindow();
+        private IWindowService _windowService;
+
+        private void Start()
+        {
+            _windowService = ServiceLocator.Current.Get<IWindowService>();
+        }
+
+        public void Close()
+        {
+            _windowService?.CloseTopWindow();
+        }
     }
-}
 }

@@ -5,10 +5,16 @@ namespace TitusGames.Framework
     public class UI_OpenWindow : MonoBehaviour
     {
         public GameObject windowPrefab;
+        private IWindowService _windowService;
+
+        private void Start()
+        {
+            _windowService = ServiceLocator.Current.Get<IWindowService>();
+        }
 
         public void Open()
         {
-            WindowManager.Instance.OpenWindow(windowPrefab);
+            _windowService?.OpenWindow(windowPrefab);
         }
     }
 }

@@ -10,13 +10,12 @@ namespace TitusGames.Framework
         [SerializeField] private GameObject primarySystemMenuPrefab;
 
         private GameObject activeMenuInstance;
+        private IWindowService _windowService;
 
         private void Start()
         {
-            if (WindowManager.Instance != null)
-            {
-                WindowManager.Instance.SetNextHandler(this);
-            }
+            _windowService = ServiceLocator.Current.Get<IWindowService>();
+            _windowService?.SetNextHandler(this);
         }
 
         public bool HandleCancel()
@@ -24,7 +23,7 @@ namespace TitusGames.Framework
             // If the system menu isn't open yet, spawn it through the WindowManager stack
             if (activeMenuInstance == null && primarySystemMenuPrefab != null)
             {
-                activeMenuInstance = WindowManager.Instance.OpenWindow(primarySystemMenuPrefab);
+                activeMenuInstance = _windowService.OpenWindow(primarySystemMenuPrefab);
                 return true; // Input completely handled/consumed
             }
 
